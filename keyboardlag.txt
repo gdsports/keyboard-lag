@@ -1,0 +1,44 @@
+https://danluu.com/keyboard-latency/
+https://www.notebookcheck.net/Are-gaming-keyboards-really-faster-than-conventional-keyboards.258470.0.html
+
+https://forums.blurbusters.com/viewtopic.php?f=10&t=1836
+http://blog.seethis.link/scan-rate-estimator/
+https://www.reddit.com/r/MechanicalKeyboards/wiki/wiki_navigation
+http://random.xem.us/rollover.html
+https://ckrisirkc.github.io/osuStreamSpeed.js/newindex.html
+https://docs.google.com/spreadsheets/d/1hNMXn_nkpXZIpDHZBcp95E7OweL4594_WDLCY_vTvm0/edit#gid=0
+
+https://forums.blurbusters.com/viewtopic.php?f=10&t=6301
+https://blog.wooting.nl/what-influences-keyboard-speed/
+
+Tokaku "Keyboard polling rate matters, here's why | osu! & Etterna" https://www.youtube.com/watch?v=heZVmr9fyng
+
+USB polling rate: The rate at which USB hosts checks a USB device such
+as a keyboard or gamepad for input. Old devices using USB Low
+Speed (1.5 MBits/sec) which has a maximum polling rate of 8 ms. Newer
+devices using USB Full Speed or higher (12 Mbits/sec or higher).
+
+Key polling rate: The rate at which the CPU inside the keyboard or
+gamepad checks the keys/buttons/joysticks for changes in
+keys/buttons/sticks. This rate is usually much slower than the USB
+polling rate because of contact debouncing. Keyboards with LED
+animation effects may also ignore keyboard scanning while is updating
+the LEDs.
+
+
+https://geekhack.org/
+https://deskthority.net/
+
+$67, GK61 GK61x RGB Hot Swap Independent Driver Tyce-C ANSI Replacable Space Cherry MX Switches Mechanical Keyboard DIY Kit Case Plate PCB
+$68, GK64 GK64x RGB Hot Swap Programmable Wired Case PCB Plate Cherry MX Keyboard DIY kit Replacable Space 
+
+$60, EPOMAKER GK61X RGB Hotswap Custom DIY Kit for 60% Keyboard, PCB Mounting Plate Case (GK61X Black)
+
+$70, EPOMAKER GK64X RGB Hotswap Custom DIY Kit for 60% Keyboard with Split Spacebar Module, PCB Mounting Plate Case (GK64X White)
++ Split space bar
+
+Womier K66 60% Keyboard, Hot Swappable Tyce-C Wired RGB Backlit Gateron Switch 60% Mechanical Keyboard with Crystalline Base for Win/Mac (Red Switch,White)
+
+Gamo2 K28
+
+
