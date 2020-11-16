@@ -5,8 +5,23 @@ should show "picket fencing" for keyboards with slow scans. The slow
 scan could be due to slow USB polling and/or slow key matrix
 scanning and debouncing. SPOILER: Some gaming keyboard have slow
 scans.
+
+This differs from pytest.py by using a higher resolution timer. This
+is useful for keyboard with faster scan rates. The number of key presses
+required has doubled. The number of the left in the histogram is now
+0.1 milliseconds. For example, 160 = 16.0 milliseconds.
+
+Using this on slow keyboards produces histograms with lots blank
+areas between peaks so pytest.py has been left unchanged.
+
+Thanks to DeltaEpsilon on Etterna Discord for the suggestion to use
+time.perf_timer().
+
 """
+import sys
 import array
+import time
+import getopt
 import pygame
 from pygame.locals import *
 
@@ -14,47 +29,68 @@ pygame.init()
 SCREEN = pygame.display.set_mode((320, 240))
 pygame.display.set_caption("Poll Test")
 
+# Program shows histograms and exits after these many events
+KEY_EVENT_LIMIT = 1000
+
 # Show one line status on the console every TIME_TICKS milliseconds
 TIME_TICKS = 1000
 
 KEY_ARRAY = array.array('B', [0] * 256)
 
-# Key down start time in ticks. Indexed by key scan code
-KEY_DOWN_ARRAY = array.array('L', [0] * 256)
+# Key down start time in float seconds. Indexed by key scan code
+KEY_DOWN_ARRAY = array.array('f', [0] * 256)
 
-# Key down delta time in ticks. Indexed by key_delta_count
-KEY_DELTA_ARRAY = array.array('L', [0] * 60 * TIME_TICKS)
+# Key down delta time in float seconds. Indexed by key_delta_count
+KEY_DELTA_ARRAY = array.array('f', [0] * 60 * TIME_TICKS)
 
-# Key event delta time in ticks
-KEY_EVENT_ARRAY = array.array('L', [0] * 60 * TIME_TICKS)
+# Key event delta time in float seconds
+KEY_EVENT_ARRAY = array.array('f', [0] * 60 * TIME_TICKS)
 
-def show_histo(f, count, rawdata):
+def show_histo(f, count, rawdata, bin_size):
     """ Write a histogram to a file """
-    histogram = array.array('L', [0]*256)
+    num_bins = int(2560 / bin_size)
+    last_bin = num_bins - 1
+    histogram = array.array('L', [0]*num_bins)
     for ticks in range(0, count):
-        if rawdata[ticks] > 255:
-            histogram[255] += 1
+        bin_index = round(rawdata[ticks]*10000/bin_size)
+        if bin_index > last_bin:
+            histogram[last_bin] += 1
         else:
-            histogram[rawdata[ticks]] += 1
-    for counts in range(0, 256):
+            histogram[bin_index] += 1
+    for counts in range(0, num_bins):
         f.write('%3d ' % (counts))
         for i in range(0, histogram[counts]):
             f.write('*')
         f.write('\n')
 
-def show_all_histos(key_delta_count, key_event_count):
+def show_all_histos(key_delta_count, key_event_count, bin_size):
     """ Write key press and key event histograms to a file """
     with open('./histograms.txt', 'w') as f:
-        f.write('Histogram of key down times in milliseconds\n')
-        show_histo(f, key_delta_count, KEY_DELTA_ARRAY)
-        f.write('\nHistogram of time between key events in milliseconds\n')
-        show_histo(f, key_event_count, KEY_EVENT_ARRAY)
+        f.write('Histogram of key down times in ' + str(round(0.1*bin_size, 1)) + ' milliseconds\n')
+        show_histo(f, key_delta_count, KEY_DELTA_ARRAY, bin_size)
+        f.write('\nHistogram of time between key events in ' + str(round(0.1*bin_size, 1)) + ' milliseconds\n')
+        show_histo(f, key_event_count, KEY_EVENT_ARRAY, bin_size)
 
 def main():
     """ pygame event loop in here """
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "b", ["bin="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err) # will print something like "option -a not recognized"
+        sys.exit(2)
+    bin_size = 10
+    for o, a in opts:
+        if o in ("-b", "--bin"):
+            bin_size = int(a)
+            if (bin_size <= 0):
+                bin_size = 1
+        else:
+            assert False, "unhandled option"
+
     key_delta_count = 0
     key_event_count = 0
-    last_event_ticks = pygame.time.get_ticks()
+    last_event_ticks = time.perf_counter()
     pygame.display.update()
     pygame.time.set_timer(pygame.USEREVENT, TIME_TICKS)
     z_down = 0
@@ -66,31 +102,31 @@ def main():
         events = pygame.event.get()
         for event in events:
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_PAUSE):
-                show_all_histos(key_delta_count, key_event_count)
+                show_all_histos(key_delta_count, key_event_count, bin_size)
                 print('')
                 print('See histograms.txt')
                 return
             elif event.type == pygame.VIDEOEXPOSE:
                 pygame.display.update()
             elif event.type == KEYDOWN:
-                KEY_EVENT_ARRAY[key_event_count] = pygame.time.get_ticks() - last_event_ticks
+                KEY_EVENT_ARRAY[key_event_count] = time.perf_counter() - last_event_ticks
                 key_event_count += 1
-                if key_event_count > 500:
-                    show_all_histos(key_delta_count, key_event_count)
+                if key_event_count > KEY_EVENT_LIMIT:
+                    show_all_histos(key_delta_count, key_event_count, bin_size)
                     return
-                last_event_ticks = pygame.time.get_ticks()
+                last_event_ticks = time.perf_counter()
                 z_down += 1
                 z_down_now += 1
                 KEY_ARRAY[event.scancode] += 1
-                KEY_DOWN_ARRAY[event.scancode] = pygame.time.get_ticks()
+                KEY_DOWN_ARRAY[event.scancode] = time.perf_counter()
             elif event.type == KEYUP:
-                KEY_EVENT_ARRAY[key_event_count] = pygame.time.get_ticks() - last_event_ticks
+                KEY_EVENT_ARRAY[key_event_count] = time.perf_counter() - last_event_ticks
                 key_event_count += 1
-                last_event_ticks = pygame.time.get_ticks()
+                last_event_ticks = time.perf_counter()
                 z_down_now -= 1
                 if KEY_ARRAY[event.scancode] > 0:
                     KEY_ARRAY[event.scancode] -= 1
-                    KEY_DELTA_ARRAY[key_delta_count] = pygame.time.get_ticks() - KEY_DOWN_ARRAY[event.scancode]
+                    KEY_DELTA_ARRAY[key_delta_count] = time.perf_counter() - KEY_DOWN_ARRAY[event.scancode]
                     key_delta_count += 1
             elif event.type == pygame.USEREVENT:
                 pygame.time.set_timer(pygame.USEREVENT, TIME_TICKS)

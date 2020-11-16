@@ -13,7 +13,7 @@ Name            |Key switch |USB VID:PID|USB Speed, Mbits/s |USB bInterval, ms  
 Logitech iTouch |membrane   |046d:c30a  |1.5                |32                 |8, 125           |Membrane keyboard
 Logitech Int 350|membrane   |046d:c313  |1.5                |10                 |16, 62.5         |Slow membrane keyboard
 FL ESports GT87S|mechanical |040b:0a67  |12                 |1                  |5, 200           |Slightly faster
-Gigabyte K83    |mechanical |04d9:a06b  |12                 |1                  |1, 1000          |Best so far
+Gigabyte K83    |mechanical |04d9:a06b  |12                 |1                  |3, 333           |Best so far
 Dierya DK61E    |optical    |1ea7:0077  |12                 |1                  |24, 42           |Whaaaaa?
 
 All tests were done on computers running Ubuntu 18.04. Two keyboards were
@@ -26,8 +26,9 @@ histogram shows 16 ms scan rate. Baffling.
 The Gigabyte K83 does not show picket fencing so I gave it scan rate of 1 ms.
 The keyboard is scannning fast enough the histogram shows no picket fencing.
 Perhaps the scan rate should be 3 ms because there are small peaks at 3 ms
-intervals. This might be clearer by switching to microsecond timing resolution
-but I suspect 3 ms versus 1 ms makes very little difference in real game play.
+intervals. UPDATE: Using a higher resolution timer and doubling the number of
+key presses makes the 3 ms scan rate clear. Thanks to DeltaEpsilon on the
+Etterna Discord for the tip.
 
 The Dierya DK61E has Gateron optical switches but it has the slowest scan rate.
 I suspect the keyboard LED animation is slowing down the keyboard scan but this
@@ -70,13 +71,28 @@ Run the key test like this.
 $ python3 keytest.py
 ```
 
+If you want higher resolution timing for fast scan keyboards, use this.
+
+```
+$ python3 keytest.py --bin=1
+```
+
+This produces histograms with 0.1 millisecond bins. The histograms are
+ten times longer but this is required if the key scan rate is close to 1 ms.
+For example, the 3 ms scan rate of the Gigabyte K83 is clearer using this
+option.
+
+The --bin options refers to the histogram bin size. The default is bin size=10
+for 10 * 0.1 millisecond (1 ms) bins. Use bin size = 1 for 0.1 millisecond
+bins.
+
 Be sure to close all other programs to get the most accurate timing. In
 particular, do not run games, web browsers, video players, or anything that
 uses lots of CPU to get the clearest histograms.
 
 Once a second the program prints a status line to show it is alive. It creates
 an small black window which MUST have the focus. Put 8-10 fingers on the
-keyboard then bang away like a drunken monkey for about 10 seconds or until the
+keyboard then bang away like a drunken monkey for about 20 seconds or until the
 program exits. Close the small window or go back to the terminal window and
 press ^C or the Pause key to stop the program. The histograms are in a file
 named histograms.txt.
@@ -84,7 +100,9 @@ named histograms.txt.
 Older versions of the program produces a histogram of key press times. The
 current version also includes a histogram of time between key events (up or
 down). This is a cross check on the first histogram since I had a hard time
-believing the results for the DK61E.
+believing the results for the DK61E. The second histogram is sometime more
+useful because the scan time is clearer. If the first is murky, take a look
+at the second one.
 
 How does this program differ from
 http://blog.seethis.link/scan-rate-estimator/?  The scan-rate-estimator shows
