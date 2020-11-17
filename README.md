@@ -1,5 +1,6 @@
-# Keyboard Scan Rate
+# Keyboard and Gamepad Scan Rates
 
+## Keyboard
 Keyboard scan rate is the the lower of the USB polling rate and the key
 hardware scan rate. keytest.py attempts to determine the keyboard scan rate
 by showing a histogram of hundreds of key press times measured in milliseconds.
@@ -110,7 +111,26 @@ the best case (shortest) key press time. This program shows histograms for
 hundreds of key presses. The histograms better characterize the keyboard
 behavior during real world use such as gaming.
 
+## Gamepad
+
+The program joytest.py is similar to keytest.py but measures the time between
+joystick/gamepad events.
+
+WARNING: The gamepads were tested on Ubuntu 18.04 so may behave differently in
+their respective consoles. There have been many revisions of gamepads over the
+year so some may behave differently.
+
+The Sony DS4 and Nintendo Switch compatible HoriPad shows clear lines at 4 ms
+intervals.
+
+The Xbox One controllers shows clear lines at 8 ms intervals but much smaller
+lines in between at 4 ms. Not sure what is happening here.
+
 ## References
+
+References to sources that measure keyboard lag/scan rate. There are an
+unlimited number of threads on this topic but just a few people are providing
+evidence.
 
 ### Keyboard polling rate matters, here's why | osu! & Etterna
 
@@ -125,4 +145,12 @@ Interesting but very short key presses can be produced by flicking dozens of
 of times.
 
 http://blog.seethis.link/scan-rate-estimator/
+
+### Keyboard Input Lag 125, 250, 500, 1000Hz USB vs. PS/2
+
+https://www.youtube.com/watch?v=eEswl6kZq5k
+
+### Keyboard Latency
+
+https://danluu.com/keyboard-latency/
 
