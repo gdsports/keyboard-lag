@@ -91,11 +91,12 @@ def main():
     pygame.time.set_timer(pygame.USEREVENT, TIME_TICKS)
     z_down = 0
     z_down_now = 0
+    pygame.fastevent.init()
     print('\nPress keys with 8-10 fingers as fast as possible for about 10 seconds.')
     print('Press the Pause key to exit. Or keep going until the program exits.')
     print('See histograms.txt for the results.\n')
     while True:
-        events = pygame.event.get()
+        events = pygame.fastevent.get()
         for event in events:
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_PAUSE):
                 show_all_histos(key_event_count, bin_size)
