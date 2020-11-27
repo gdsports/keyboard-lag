@@ -1,0 +1,10 @@
+NSGadget_HID running on an Adafruit ItsyBitsy M0 Express connected to
+an computer running Ubuntu 18.04 AMD64.
+
+bInterval = 1 and Linux polls every 1 ms as requested. When the same
+board running NSGadget_HID is connected to a Nintendo Switch, the
+Switch ignores bInterval and polls every 7 ms. This is true for the
+USB port on the back of the dock, the 2 USB ports on the side of the
+dock, and the USB type C port on the bottom of the Switch.
+
+https://github.com/gdsports/NSGadget_HID
